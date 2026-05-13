@@ -52,8 +52,8 @@ export default function SellPage() {
       game, category, name,
       price: parseFloat(Number(price).toFixed(2)),
       condition, rarity, description, emoji,
-      seller: user.name,
-      sellerEmail: user.email,
+      seller: user!.name,
+      sellerEmail: user!.email,
     });
     router.push("/");
   }
