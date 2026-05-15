@@ -49,6 +49,7 @@ type AppContextType = {
   requestSellerAccess: () => Promise<void>;
   approveRequest: (requestId: string, userId: string) => Promise<void>;
   rejectRequest: (requestId: string) => Promise<void>;
+  refreshPendingRequests: () => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -228,6 +229,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       signInWithGoogle, signOut,
       addListing, requestSellerAccess,
       approveRequest, rejectRequest,
+      refreshPendingRequests: fetchPendingRequests,
     }}>
       {children}
     </AppContext.Provider>

@@ -1,11 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "../context/AppContext";
 
 export default function AdminPage() {
-  const { user, profile, loading, pendingRequests, approveRequest, rejectRequest } = useApp();
+  const { user, profile, loading, pendingRequests, approveRequest, rejectRequest, refreshPendingRequests } = useApp();
   const router = useRouter();
+
+  useEffect(() => {
+    if (profile?.is_admin) refreshPendingRequests();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.is_admin]);
 
   if (loading) {
     return (
