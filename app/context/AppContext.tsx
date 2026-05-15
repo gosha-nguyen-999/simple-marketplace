@@ -18,58 +18,167 @@ export type Listing = {
   description?: string;
 };
 
-const INITIAL_LISTINGS: Listing[] = [
-  { id: 1, game: "CS2", category: "Knife", name: "Karambit | Fade", price: 1249.99, rarity: "Exotic", condition: "Factory New", seller: "TradeKing_EU", sellerEmail: "tradeking@vault.trade", emoji: "🔪", description: "One of the most sought-after knives in CS2. Stunning fade pattern with full fade on the blade." },
-  { id: 2, game: "CS2", category: "Skin", name: "AK-47 | Fire Serpent", price: 389.50, rarity: "Legendary", condition: "Field-Tested", seller: "SkinVault_Pro", sellerEmail: "skinvault@vault.trade", emoji: "🔫", description: "Iconic AK-47 skin with the legendary Fire Serpent pattern. Field-tested with minimal visible wear." },
-  { id: 3, game: "CS2", category: "Gloves", name: "Sport Gloves | Pandora's Box", price: 874.00, rarity: "Epic", condition: "Minimal Wear", seller: "GloveGod", sellerEmail: "glovegod@vault.trade", emoji: "🧤", description: "Premium sport gloves with the rare Pandora's Box pattern. Near mint condition." },
-  { id: 4, game: "CS2", category: "Skin", name: "AWP | Dragon Lore", price: 2100.00, rarity: "Exotic", condition: "Well-Worn", seller: "LegendaryDrops", sellerEmail: "legendary@vault.trade", emoji: "🎯", description: "The holy grail of AWP skins. Dragon Lore with well-worn finish — still shows the iconic dragon." },
-  { id: 5, game: "Valorant", category: "Gun Skin", name: "Reaver Vandal", price: 24.99, rarity: "Rare", condition: "Unused", seller: "ValorantVault", sellerEmail: "vavault@vault.trade", emoji: "⚡", description: "Reaver Vandal from the Reaver 2.0 collection. Includes custom animations and sound effects." },
-  { id: 6, game: "Valorant", category: "Bundle", name: "Prime 2.0 Collection", price: 67.00, rarity: "Epic", condition: "Unused", seller: "AgentZero", sellerEmail: "agentzero@vault.trade", emoji: "👑", description: "Full Prime 2.0 bundle including all weapon skins. Account transfer included." },
-  { id: 7, game: "Valorant", category: "Gun Skin", name: "Glitchpop Phantom", price: 19.50, rarity: "Rare", condition: "Unused", seller: "NeonRifle_VA", sellerEmail: "neonrifle@vault.trade", emoji: "🌀", description: "Cyberpunk-themed Phantom skin with animated glitch effects and custom finisher." },
-  { id: 8, game: "Valorant", category: "Gun Skin", name: "Ruination Operator", price: 31.00, rarity: "Epic", condition: "Unused", seller: "DarkRealmGG", sellerEmail: "darkrealm@vault.trade", emoji: "💀", description: "From the Ruination collection. Dark, eerie aesthetic with haunting animations." },
-  { id: 9, game: "Fortnite", category: "Outfit", name: "Renegade Raider", price: 145.00, rarity: "Legendary", condition: "Account-Bound", seller: "OGSkins_FN", sellerEmail: "ogskins@vault.trade", emoji: "🪖", description: "Season 1 OG skin — one of the rarest outfits in Fortnite. Full account with skin included." },
-  { id: 10, game: "Fortnite", category: "Pickaxe", name: "AC/DC Pickaxe", price: 55.00, rarity: "Rare", condition: "Account-Bound", seller: "FortKing99", sellerEmail: "fortking@vault.trade", emoji: "⛏️", description: "The AC/DC pickaxe from Chapter 1. Rarely seen in lobbies today." },
-  { id: 11, game: "Fortnite", category: "Emote", name: "Orange Justice", price: 89.99, rarity: "Epic", condition: "Account-Bound", seller: "DanceMaster_FN", sellerEmail: "dancemaster@vault.trade", emoji: "🕺", description: "The iconic Orange Justice emote from Season 4. A true piece of Fortnite history." },
-  { id: 12, game: "Fortnite", category: "Outfit", name: "Galaxy Scout", price: 210.00, rarity: "Legendary", condition: "Account-Bound", seller: "GalaxyDrops", sellerEmail: "galaxy@vault.trade", emoji: "🌌", description: "Samsung exclusive Galaxy Scout skin. Extremely rare — only available through Samsung promotion." },
-  { id: 13, game: "Roblox", category: "Limited", name: "Valkyrie Helm", price: 312.00, rarity: "Legendary", condition: "Tradeable", seller: "RobloxRoyal", sellerEmail: "robloxroyal@vault.trade", emoji: "🪄", description: "Classic Roblox limited item. The Valkyrie Helm is a must-have for any serious collector." },
-  { id: 14, game: "Roblox", category: "Accessory", name: "Clockwork's Headphones", price: 44.00, rarity: "Uncommon", condition: "Tradeable", seller: "LimitedLoot_RBX", sellerEmail: "limitedloot@vault.trade", emoji: "🎧", description: "Retro headphones accessory from Clockwork's collection. Great addition to any avatar." },
-  { id: 15, game: "Roblox", category: "Game Pass", name: "Bloxburg Premium Pack", price: 12.00, rarity: "Common", condition: "Transferable", seller: "PassMaster_RBX", sellerEmail: "passmaster@vault.trade", emoji: "🎮", description: "Bloxburg premium game pass. Unlock all premium features instantly." },
-  { id: 16, game: "Roblox", category: "Limited", name: "Domino Crown", price: 1850.00, rarity: "Exotic", condition: "Tradeable", seller: "CrownKing_RBX", sellerEmail: "crownking@vault.trade", emoji: "👸", description: "The legendary Domino Crown — one of the rarest and most valuable items in all of Roblox." },
-];
+export type Profile = {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  is_seller: boolean;
+  is_admin: boolean;
+};
+
+export type SellerRequestStatus = "none" | "pending" | "approved" | "rejected";
+
+export type PendingRequest = {
+  id: string;
+  user_id: string;
+  created_at: string;
+  email: string | null;
+  full_name: string | null;
+};
 
 type AppContextType = {
   user: User | null;
+  profile: Profile | null;
   loading: boolean;
   listings: Listing[];
+  sellerRequestStatus: SellerRequestStatus;
+  pendingRequests: PendingRequest[];
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  addListing: (listing: Omit<Listing, "id">) => void;
+  addListing: (listing: Omit<Listing, "id">) => Promise<void>;
+  requestSellerAccess: () => Promise<void>;
+  approveRequest: (requestId: string, userId: string) => Promise<void>;
+  rejectRequest: (requestId: string) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
 
+function mapRow(row: Record<string, unknown>): Listing {
+  return {
+    id: row.id as number,
+    game: row.game as string,
+    category: row.category as string,
+    name: row.name as string,
+    price: Number(row.price),
+    rarity: row.rarity as string,
+    condition: row.condition as string,
+    description: row.description as string | undefined,
+    emoji: row.emoji as string,
+    seller: row.seller_name as string,
+    sellerEmail: row.seller_email as string,
+  };
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [listings, setListings] = useState<Listing[]>(INITIAL_LISTINGS);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [sellerRequestStatus, setSellerRequestStatus] = useState<SellerRequestStatus>("none");
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
+
+  async function fetchListings() {
+    const { data } = await supabase
+      .from("listings")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setListings(data.map(mapRow));
+  }
+
+  async function fetchProfile(uid: string, email: string | undefined, name: string | undefined) {
+    console.log("[fetchProfile] called for", email, uid);
+    const { data: existing, error: selectErr } = await supabase.from("profiles").select("*").eq("id", uid).single();
+    console.log("[fetchProfile] existing:", existing, "selectErr:", selectErr?.message);
+    if (existing) {
+      setProfile(existing as Profile);
+      return existing as Profile | null;
+    }
+    // Profile doesn't exist yet (user pre-dates the trigger) — create it
+    const { error } = await supabase.from("profiles").insert({
+      id: uid,
+      email: email ?? null,
+      full_name: name ?? null,
+    });
+    console.log("[fetchProfile] insert error:", error?.message ?? "none");
+    if (error) {
+      console.error("Failed to create profile:", error.message, error);
+      return null;
+    }
+    const { data: fresh } = await supabase.from("profiles").select("*").eq("id", uid).single();
+    console.log("[fetchProfile] fresh profile:", fresh);
+    if (fresh) setProfile(fresh as Profile);
+    return fresh as Profile | null;
+  }
+
+  async function fetchSellerRequestStatus(uid: string) {
+    const { data } = await supabase
+      .from("seller_requests")
+      .select("status")
+      .eq("user_id", uid)
+      .maybeSingle();
+    setSellerRequestStatus((data?.status as SellerRequestStatus) ?? "none");
+  }
+
+  async function fetchPendingRequests() {
+    const { data: requests } = await supabase
+      .from("seller_requests")
+      .select("id, user_id, created_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
+
+    if (!requests || requests.length === 0) {
+      setPendingRequests([]);
+      return;
+    }
+
+    const userIds = requests.map((r) => r.user_id);
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, email, full_name")
+      .in("id", userIds);
+
+    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    setPendingRequests(
+      requests.map((r) => ({
+        id: r.id,
+        user_id: r.user_id,
+        created_at: r.created_at,
+        email: profileMap.get(r.user_id)?.email ?? null,
+        full_name: profileMap.get(r.user_id)?.full_name ?? null,
+      }))
+    );
+  }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) {
+        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
+        await fetchSellerRequestStatus(u.id);
+        if (p?.is_admin) await fetchPendingRequests();
+      }
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) {
+        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
+        await fetchSellerRequestStatus(u.id);
+        if (p?.is_admin) await fetchPendingRequests();
+      } else {
+        setProfile(null);
+        setSellerRequestStatus("none");
+        setPendingRequests([]);
+      }
     });
 
-    const storedListings = localStorage.getItem("vt_listings");
-    if (storedListings) {
-      const extra = JSON.parse(storedListings) as Listing[];
-      setListings([...INITIAL_LISTINGS, ...extra]);
-    }
+    fetchListings();
 
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function signInWithGoogle() {
@@ -82,20 +191,61 @@ export function AppProvider({ children }: { children: ReactNode }) {
   async function signOut() {
     await supabase.auth.signOut();
     setUser(null);
+    setProfile(null);
+    setSellerRequestStatus("none");
+    setPendingRequests([]);
   }
 
-  function addListing(data: Omit<Listing, "id">) {
-    const newListing: Listing = { ...data, id: Date.now() };
-    setListings((prev) => {
-      const updated = [newListing, ...prev];
-      const userAdded = updated.filter((l) => !INITIAL_LISTINGS.find((i) => i.id === l.id));
-      localStorage.setItem("vt_listings", JSON.stringify(userAdded));
-      return updated;
-    });
+  async function addListing(data: Omit<Listing, "id">) {
+    const { data: row, error } = await supabase
+      .from("listings")
+      .insert({
+        user_id: user!.id,
+        game: data.game,
+        category: data.category,
+        name: data.name,
+        price: data.price,
+        rarity: data.rarity,
+        condition: data.condition,
+        description: data.description ?? null,
+        emoji: data.emoji,
+        seller_name: data.seller,
+        seller_email: data.sellerEmail,
+      })
+      .select()
+      .single();
+
+    if (!error && row) {
+      setListings((prev) => [mapRow(row as Record<string, unknown>), ...prev]);
+    }
+  }
+
+  async function requestSellerAccess() {
+    const { error } = await supabase
+      .from("seller_requests")
+      .insert({ user_id: user!.id });
+    if (!error) setSellerRequestStatus("pending");
+  }
+
+  async function approveRequest(requestId: string, userId: string) {
+    await supabase.from("seller_requests").update({ status: "approved" }).eq("id", requestId);
+    await supabase.from("profiles").update({ is_seller: true }).eq("id", userId);
+    setPendingRequests((prev) => prev.filter((r) => r.id !== requestId));
+  }
+
+  async function rejectRequest(requestId: string) {
+    await supabase.from("seller_requests").update({ status: "rejected" }).eq("id", requestId);
+    setPendingRequests((prev) => prev.filter((r) => r.id !== requestId));
   }
 
   return (
-    <AppContext.Provider value={{ user, loading, listings, signInWithGoogle, signOut, addListing }}>
+    <AppContext.Provider value={{
+      user, profile, loading, listings,
+      sellerRequestStatus, pendingRequests,
+      signInWithGoogle, signOut,
+      addListing, requestSellerAccess,
+      approveRequest, rejectRequest,
+    }}>
       {children}
     </AppContext.Provider>
   );

@@ -17,7 +17,7 @@ const RARITIES = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Exotic"];
 const EMOJIS = ["🔪", "🔫", "🧤", "🎯", "⚡", "👑", "🌀", "💀", "🪖", "⛏️", "🕺", "🌌", "🪄", "🎧", "🎮", "👸", "🏆", "💎", "🎁", "🛡️"];
 
 export default function SellPage() {
-  const { user, addListing } = useApp();
+  const { user, profile, sellerRequestStatus, addListing, requestSellerAccess } = useApp();
   const router = useRouter();
 
   const [game, setGame] = useState("CS2");
@@ -29,7 +29,9 @@ export default function SellPage() {
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("🔫");
   const [error, setError] = useState("");
+  const [requesting, setRequesting] = useState(false);
 
+  // ── Not logged in ────────────────────────────────────────────────────────────
   if (!user) {
     return (
       <div style={{ minHeight: "100vh", background: "#0d0d14", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, color: "#f0f0f0" }}>
@@ -43,12 +45,53 @@ export default function SellPage() {
     );
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  // ── Logged in but not a seller ───────────────────────────────────────────────
+  if (!profile?.is_seller) {
+    const isPending  = sellerRequestStatus === "pending";
+    const isRejected = sellerRequestStatus === "rejected";
+
+    return (
+      <div style={{ minHeight: "100vh", background: "#0d0d14", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, color: "#f0f0f0", padding: 24, textAlign: "center" }}>
+        <div style={{ fontSize: 48 }}>{isPending ? "⏳" : isRejected ? "❌" : "🏪"}</div>
+        <h2 style={{ fontSize: 22, fontWeight: 700 }}>
+          {isPending  ? "Request pending"  :
+           isRejected ? "Request rejected" :
+           "Become a seller"}
+        </h2>
+        <p style={{ fontSize: 14, color: "#64748b", maxWidth: 360, lineHeight: 1.6 }}>
+          {isPending
+            ? "Your seller request is being reviewed by an admin. You'll be able to list items once approved."
+            : isRejected
+            ? "Your seller request was not approved. Contact support if you think this is a mistake."
+            : "Only approved sellers can list items. Request access and an admin will review your application."}
+        </p>
+        {!isPending && !isRejected && (
+          <button
+            disabled={requesting}
+            onClick={async () => {
+              setRequesting(true);
+              await requestSellerAccess();
+              setRequesting(false);
+            }}
+            style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", padding: "12px 28px", borderRadius: 10, cursor: requesting ? "default" : "pointer", fontSize: 15, fontWeight: 700, opacity: requesting ? 0.7 : 1 }}
+          >
+            {requesting ? "Sending request…" : "Request seller access"}
+          </button>
+        )}
+        <button onClick={() => router.push("/")} style={{ background: "transparent", border: "none", color: "#64748b", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>
+          Back to marketplace
+        </button>
+      </div>
+    );
+  }
+
+  // ── Approved seller: show listing form ───────────────────────────────────────
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name || !price) { setError("Name and price are required."); return; }
     if (isNaN(Number(price)) || Number(price) <= 0) { setError("Enter a valid price."); return; }
 
-    addListing({
+    await addListing({
       game, category, name,
       price: parseFloat(Number(price).toFixed(2)),
       condition, rarity, description, emoji,
@@ -63,7 +106,6 @@ export default function SellPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#0d0d14", color: "#f0f0f0" }}>
-      {/* Nav */}
       <nav style={{ background: "rgba(13,13,20,0.95)", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <a href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</a>
@@ -76,7 +118,6 @@ export default function SellPage() {
         <p style={{ fontSize: 14, color: "#64748b", marginBottom: 36 }}>Fill in the details below to create your listing.</p>
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Game + Category */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <div>
               <label style={labelStyle}>Game</label>
@@ -92,13 +133,11 @@ export default function SellPage() {
             </div>
           </div>
 
-          {/* Name */}
           <div>
             <label style={labelStyle}>Item name</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. AK-47 | Fire Serpent" style={fieldStyle} />
           </div>
 
-          {/* Price + Condition */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <div>
               <label style={labelStyle}>Price (USD)</label>
@@ -112,7 +151,6 @@ export default function SellPage() {
             </div>
           </div>
 
-          {/* Rarity */}
           <div>
             <label style={labelStyle}>Rarity</label>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -129,7 +167,6 @@ export default function SellPage() {
             </div>
           </div>
 
-          {/* Emoji picker */}
           <div>
             <label style={labelStyle}>Icon</label>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -142,7 +179,6 @@ export default function SellPage() {
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <label style={labelStyle}>Description (optional)</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your item, condition details, trade history..." rows={4}

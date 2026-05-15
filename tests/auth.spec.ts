@@ -99,3 +99,35 @@ test("homepage nav does not show sell button when logged out", async ({ page }) 
   await page.goto("/");
   await expect(page.getByRole("button", { name: /\+ sell/i })).not.toBeVisible();
 });
+
+// ─── Sell page: non-seller states ────────────────────────────────────────────
+
+test("sell page shows become-a-seller prompt for unauthenticated user", async ({ page }) => {
+  await page.goto("/sell");
+  await expect(page.getByText(/sign in to list an item/i)).toBeVisible();
+});
+
+test("sell page request-access button is present for unauthenticated user view", async ({ page }) => {
+  await page.goto("/sell");
+  // Unauthenticated users see login/signup, not the request button
+  await expect(page.getByRole("button", { name: /log in/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /sign up/i })).toBeVisible();
+});
+
+// ─── Admin page: unauthenticated ─────────────────────────────────────────────
+
+test("admin page shows access denied when not logged in", async ({ page }) => {
+  await page.goto("/admin");
+  await expect(page.getByText(/access denied/i)).toBeVisible();
+});
+
+test("admin page shows back to marketplace button when access denied", async ({ page }) => {
+  await page.goto("/admin");
+  await expect(page.getByRole("button", { name: /back to marketplace/i })).toBeVisible();
+});
+
+test("admin page back button navigates to homepage", async ({ page }) => {
+  await page.goto("/admin");
+  await page.getByRole("button", { name: /back to marketplace/i }).click();
+  await expect(page).toHaveURL("/");
+});

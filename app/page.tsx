@@ -24,7 +24,7 @@ const GAME_FILTERS = [
 type SortKey = "newest" | "price-asc" | "price-desc";
 
 export default function Home() {
-  const { user, signOut, listings } = useApp();
+  const { user, profile, signOut, listings } = useApp();
   const router = useRouter();
   const [activeGame, setActiveGame] = useState("all");
   const [sort, setSort] = useState<SortKey>("newest");
@@ -56,9 +56,15 @@ export default function Home() {
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {user ? (
               <>
-                <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
-                  + Sell
-                </button>
+                {profile?.is_seller ? (
+                  <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
+                    + Sell
+                  </button>
+                ) : (
+                  <button onClick={() => router.push("/sell")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.4)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
+                    Become a seller
+                  </button>
+                )}
                 <span style={{ fontSize: 14, color: "#94a3b8" }}>
                   {displayName(user)}
                 </span>

@@ -4,19 +4,35 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
+async function ensureProfile(userId: string, email: string | undefined, name: string | undefined) {
+  const { data: existing } = await supabase.from("profiles").select("id").eq("id", userId).single();
+  if (existing) return;
+  await supabase.from("profiles").insert({
+    id: userId,
+    email: email ?? null,
+    full_name: name ?? null,
+  });
+}
+
 export default function AuthCallbackPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        const u = session.user;
+        await ensureProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
         router.replace("/");
       }
     });
 
     // Handle hash-based tokens (implicit flow fallback)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/");
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const u = session.user;
+        await ensureProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
+        router.replace("/");
+      }
     });
 
     return () => subscription.unsubscribe();

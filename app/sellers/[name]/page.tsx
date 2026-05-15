@@ -13,7 +13,7 @@ function avatarInitials(name: string) {
 }
 
 export default function SellerPage() {
-  const { listings, user } = useApp();
+  const { listings, user, profile } = useApp();
   const router = useRouter();
   const params = useParams();
   const sellerName = decodeURIComponent(params.name as string);
@@ -42,7 +42,7 @@ export default function SellerPage() {
           <a href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</a>
           <div style={{ display: "flex", gap: 12 }}>
             {user ? (
-              <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>+ Sell</button>
+              profile?.is_seller && <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>+ Sell</button>
             ) : (
               <>
                 <button onClick={() => router.push("/login")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>Log in</button>
