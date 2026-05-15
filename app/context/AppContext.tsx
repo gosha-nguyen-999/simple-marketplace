@@ -86,9 +86,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (data) setListings(data.map(mapRow));
   }
 
-  async function fetchProfile(uid: string, email: string | undefined, name: string | undefined) {
+  async function fetchProfile(uid: string) {
     // ensure_profile() is SECURITY DEFINER — runs as postgres, bypasses RLS
-    await supabase.rpc("ensure_profile", { p_email: email ?? null, p_full_name: name ?? null });
+    await supabase.rpc("ensure_profile");
     const { data } = await supabase.from("profiles").select("*").eq("id", uid).single();
     if (data) setProfile(data as Profile);
     return data as Profile | null;
@@ -137,19 +137,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       const u = session?.user ?? null;
       setUser(u);
-      if (u) {
-        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
-        await fetchSellerRequestStatus(u.id);
-        if (p?.is_admin) await fetchPendingRequests();
+      try {
+        if (u) {
+          const p = await fetchProfile(u.id);
+          await fetchSellerRequestStatus(u.id);
+          if (p?.is_admin) await fetchPendingRequests();
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
+        const p = await fetchProfile(u.id);
         await fetchSellerRequestStatus(u.id);
         if (p?.is_admin) await fetchPendingRequests();
       } else {
