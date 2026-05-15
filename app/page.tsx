@@ -24,7 +24,7 @@ const GAME_FILTERS = [
 type SortKey = "newest" | "price-asc" | "price-desc";
 
 export default function Home() {
-  const { user, profile, signOut, listings } = useApp();
+  const { user, profile, sellerRequestStatus, signOut, listings } = useApp();
   const router = useRouter();
   const [activeGame, setActiveGame] = useState("all");
   const [sort, setSort] = useState<SortKey>("newest");
@@ -60,6 +60,10 @@ export default function Home() {
                   <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
                     + Sell
                   </button>
+                ) : sellerRequestStatus === "pending" ? (
+                  <span style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, fontSize: 14, fontWeight: 500 }}>
+                    ⏳ Approval pending
+                  </span>
                 ) : (
                   <button onClick={() => router.push("/sell")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.4)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
                     Become a seller

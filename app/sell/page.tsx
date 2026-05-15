@@ -71,7 +71,7 @@ export default function SellPage() {
             onClick={async () => {
               setRequesting(true);
               await requestSellerAccess();
-              setRequesting(false);
+              router.push("/");
             }}
             style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", padding: "12px 28px", borderRadius: 10, cursor: requesting ? "default" : "pointer", fontSize: 15, fontWeight: 700, opacity: requesting ? 0.7 : 1 }}
           >

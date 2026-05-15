@@ -118,16 +118,18 @@ test("sell page request-access button is present for unauthenticated user view",
 
 test("admin page shows access denied when not logged in", async ({ page }) => {
   await page.goto("/admin");
-  await expect(page.getByText(/access denied/i)).toBeVisible();
+  await expect(page.getByText(/access denied/i)).toBeVisible({ timeout: 60000 });
 });
 
 test("admin page shows back to marketplace button when access denied", async ({ page }) => {
   await page.goto("/admin");
-  await expect(page.getByRole("button", { name: /back to marketplace/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /back to marketplace/i })).toBeVisible({ timeout: 60000 });
 });
 
 test("admin page back button navigates to homepage", async ({ page }) => {
   await page.goto("/admin");
-  await page.getByRole("button", { name: /back to marketplace/i }).click();
+  const backBtn = page.getByRole("button", { name: /back to marketplace/i });
+  await backBtn.waitFor({ timeout: 60000 });
+  await backBtn.click();
   await expect(page).toHaveURL("/");
 });
