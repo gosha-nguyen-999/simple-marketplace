@@ -64,7 +64,7 @@ function mapRow(row: Record<string, unknown>): Listing {
     condition: row.condition as string,
     description: row.description as string | undefined,
     emoji: row.emoji as string,
-    seller: row.seller_name as string,
+    seller: row.seller as string,
     sellerEmail: row.seller_email as string,
   };
 }
@@ -192,7 +192,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         condition: data.condition,
         description: data.description ?? null,
         emoji: data.emoji,
-        seller_name: data.seller,
+        seller: data.seller,
         seller_email: data.sellerEmail,
       })
       .select()

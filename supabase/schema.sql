@@ -32,7 +32,7 @@ create table if not exists public.listings (
   condition    text not null,
   description  text,
   emoji        text not null,
-  seller_name  text not null,
+  seller       text not null,
   seller_email text not null,
   created_at   timestamptz not null default now()
 );
