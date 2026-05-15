@@ -85,29 +85,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (data) setListings(data.map(mapRow));
   }
 
-  async function fetchProfile(uid: string, email: string | undefined, name: string | undefined) {
-    console.log("[fetchProfile] called for", email, uid);
-    const { data: existing, error: selectErr } = await supabase.from("profiles").select("*").eq("id", uid).single();
-    console.log("[fetchProfile] existing:", existing, "selectErr:", selectErr?.message);
-    if (existing) {
-      setProfile(existing as Profile);
-      return existing as Profile | null;
-    }
-    // Profile doesn't exist yet (user pre-dates the trigger) — create it
-    const { error } = await supabase.from("profiles").insert({
-      id: uid,
-      email: email ?? null,
-      full_name: name ?? null,
-    });
-    console.log("[fetchProfile] insert error:", error?.message ?? "none");
-    if (error) {
-      console.error("Failed to create profile:", error.message, error);
-      return null;
-    }
-    const { data: fresh } = await supabase.from("profiles").select("*").eq("id", uid).single();
-    console.log("[fetchProfile] fresh profile:", fresh);
-    if (fresh) setProfile(fresh as Profile);
-    return fresh as Profile | null;
+  async function fetchProfile(uid: string) {
+    // ensure_profile() is SECURITY DEFINER — runs as postgres, bypasses RLS
+    await supabase.rpc("ensure_profile");
+    const { data } = await supabase.from("profiles").select("*").eq("id", uid).single();
+    if (data) setProfile(data as Profile);
+    return data as Profile | null;
   }
 
   async function fetchSellerRequestStatus(uid: string) {
@@ -154,7 +137,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
+        const p = await fetchProfile(u.id);
         await fetchSellerRequestStatus(u.id);
         if (p?.is_admin) await fetchPendingRequests();
       }
@@ -165,7 +148,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
+        const p = await fetchProfile(u.id);
         await fetchSellerRequestStatus(u.id);
         if (p?.is_admin) await fetchPendingRequests();
       } else {

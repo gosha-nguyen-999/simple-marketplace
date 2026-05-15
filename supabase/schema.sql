@@ -112,7 +112,25 @@ create policy "listings: seller insert" on public.listings for insert with check
 );
 create policy "listings: owner delete"  on public.listings for delete using (auth.uid() = user_id);
 
--- ── 5. Make yourself admin ───────────────────────────────────
+-- ── 5. ensure_profile() — safe upsert callable from client ──
+-- SECURITY DEFINER runs as postgres, bypassing RLS.
+-- Call via: supabase.rpc('ensure_profile')
+
+create or replace function public.ensure_profile()
+returns void as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then return; end if;
+  insert into public.profiles (id, email, full_name)
+  select uid, email, raw_user_meta_data->>'full_name'
+  from auth.users
+  where id = uid
+  on conflict (id) do nothing;
+end;
+$$ language plpgsql security definer;
+
+-- ── 6. Make yourself admin ───────────────────────────────────
 -- After signing in once with Google, run this separately:
 --
 -- update public.profiles set is_admin = true where email = 'your@email.com';
