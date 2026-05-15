@@ -69,6 +69,11 @@ export default function Home() {
                     Become a seller
                   </button>
                 )}
+                {profile?.is_admin && (
+                  <button onClick={() => router.push("/admin")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.3)", color: "#a855f7", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
+                    Admin
+                  </button>
+                )}
                 <span style={{ fontSize: 14, color: "#94a3b8" }}>
                   {displayName(user)}
                 </span>
