@@ -108,7 +108,7 @@ create policy "requests: admin update" on public.seller_requests for update usin
 -- listings
 create policy "listings: public read"   on public.listings for select using (true);
 create policy "listings: seller insert" on public.listings for insert with check (
-  exists (select 1 from public.profiles where id = auth.uid() and is_seller)
+  exists (select 1 from public.profiles where id = auth.uid() and (is_seller or is_admin))
 );
 create policy "listings: owner delete"  on public.listings for delete using (auth.uid() = user_id);
 

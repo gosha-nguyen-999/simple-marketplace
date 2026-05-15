@@ -45,8 +45,8 @@ export default function SellPage() {
     );
   }
 
-  // ── Logged in but not a seller ───────────────────────────────────────────────
-  if (!profile?.is_seller) {
+  // ── Logged in but not a seller or admin ─────────────────────────────────────
+  if (!profile?.is_seller && !profile?.is_admin) {
     const isPending  = sellerRequestStatus === "pending";
     const isRejected = sellerRequestStatus === "rejected";
 
