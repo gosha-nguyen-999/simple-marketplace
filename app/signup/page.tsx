@@ -1,72 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useApp } from "../context/AppContext";
 
 export default function SignupPage() {
-  const { login } = useApp();
-  const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name || !email || !password) { setError("Please fill in all fields."); return; }
-    if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
-    login({ name, email });
-    router.push("/");
-  }
+  const { signInWithGoogle } = useApp();
 
   return (
     <div style={{ minHeight: "100vh", background: "#0d0d14", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <a href="/" style={{ fontSize: 24, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none", marginBottom: 40 }}>
         VaultTrade
       </a>
-      <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "40px 36px", width: "100%", maxWidth: 420 }}>
+      <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "40px 36px", width: "100%", maxWidth: 400, textAlign: "center" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#f0f0f0" }}>Create your account</h1>
-        <p style={{ fontSize: 14, color: "#64748b", marginBottom: 32 }}>Start buying and selling game assets today</p>
+        <p style={{ fontSize: 14, color: "#64748b", marginBottom: 36 }}>Start buying and selling game assets today</p>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "#94a3b8", display: "block", marginBottom: 6 }}>Username</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="TradeKing_EU"
-              style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 14px", color: "#f0f0f0", fontSize: 15, outline: "none", boxSizing: "border-box" }}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "#94a3b8", display: "block", marginBottom: 6 }}>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 14px", color: "#f0f0f0", fontSize: 15, outline: "none", boxSizing: "border-box" }}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "#94a3b8", display: "block", marginBottom: 6 }}>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 14px", color: "#f0f0f0", fontSize: 15, outline: "none", boxSizing: "border-box" }}
-            />
-          </div>
-          {error && <p style={{ fontSize: 13, color: "#f43f5e" }}>{error}</p>}
-          <button type="submit" style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 10, padding: "14px", fontWeight: 700, fontSize: 15, cursor: "pointer", marginTop: 8 }}>
-            Create account
-          </button>
-        </form>
+        <button
+          onClick={signInWithGoogle}
+          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, background: "#fff", color: "#1a1a1a", border: "none", borderRadius: 10, padding: "14px", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+        >
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Sign up with Google
+        </button>
 
-        <p style={{ fontSize: 13, color: "#64748b", marginTop: 24, textAlign: "center" }}>
+        <p style={{ fontSize: 13, color: "#64748b", marginTop: 24 }}>
           Already have an account?{" "}
           <a href="/login" style={{ color: "#a855f7", fontWeight: 600, textDecoration: "none" }}>Log in</a>
         </p>

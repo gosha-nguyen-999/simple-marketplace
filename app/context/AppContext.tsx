@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "../../lib/supabase";
 
 export type Listing = {
   id: number;
@@ -14,11 +16,6 @@ export type Listing = {
   sellerEmail: string;
   emoji: string;
   description?: string;
-};
-
-export type User = {
-  name: string;
-  email: string;
 };
 
 const INITIAL_LISTINGS: Listing[] = [
@@ -42,9 +39,10 @@ const INITIAL_LISTINGS: Listing[] = [
 
 type AppContextType = {
   user: User | null;
+  loading: boolean;
   listings: Listing[];
-  login: (user: User) => void;
-  logout: () => void;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
   addListing: (listing: Omit<Listing, "id">) => void;
 };
 
@@ -52,26 +50,38 @@ const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<Listing[]>(INITIAL_LISTINGS);
 
   useEffect(() => {
-    const stored = localStorage.getItem("vt_user");
-    if (stored) setUser(JSON.parse(stored));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     const storedListings = localStorage.getItem("vt_listings");
     if (storedListings) {
       const extra = JSON.parse(storedListings) as Listing[];
       setListings([...INITIAL_LISTINGS, ...extra]);
     }
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  function login(u: User) {
-    setUser(u);
-    localStorage.setItem("vt_user", JSON.stringify(u));
+  async function signInWithGoogle() {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
   }
 
-  function logout() {
+  async function signOut() {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem("vt_user");
   }
 
   function addListing(data: Omit<Listing, "id">) {
@@ -85,7 +95,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AppContext.Provider value={{ user, listings, login, logout, addListing }}>
+    <AppContext.Provider value={{ user, loading, listings, signInWithGoogle, signOut, addListing }}>
       {children}
     </AppContext.Provider>
   );
@@ -95,4 +105,8 @@ export function useApp() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used within AppProvider");
   return ctx;
+}
+
+export function displayName(user: User): string {
+  return user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.email?.split("@")[0] ?? "User";
 }

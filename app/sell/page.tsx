@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useApp } from "../context/AppContext";
+import { useApp, displayName } from "../context/AppContext";
 
 const GAMES = ["CS2", "Valorant", "Fortnite", "Roblox", "Other"];
 const CATEGORIES: Record<string, string[]> = {
@@ -52,8 +52,8 @@ export default function SellPage() {
       game, category, name,
       price: parseFloat(Number(price).toFixed(2)),
       condition, rarity, description, emoji,
-      seller: user!.name,
-      sellerEmail: user!.email,
+      seller: displayName(user!),
+      sellerEmail: user!.email ?? "",
     });
     router.push("/");
   }
@@ -67,7 +67,7 @@ export default function SellPage() {
       <nav style={{ background: "rgba(13,13,20,0.95)", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <a href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</a>
-          <span style={{ fontSize: 14, color: "#64748b" }}>Logged in as <span style={{ color: "#a855f7" }}>{user.name}</span></span>
+          <span style={{ fontSize: 14, color: "#64748b" }}>Logged in as <span style={{ color: "#a855f7" }}>{displayName(user)}</span></span>
         </div>
       </nav>
 

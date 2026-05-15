@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useApp } from "./context/AppContext";
+import { useApp, displayName } from "./context/AppContext";
 
 const RARITY_COLORS: Record<string, { accent: string }> = {
   Common:    { accent: "#94a3b8" },
@@ -24,7 +24,7 @@ const GAME_FILTERS = [
 type SortKey = "newest" | "price-asc" | "price-desc";
 
 export default function Home() {
-  const { user, logout, listings } = useApp();
+  const { user, signOut, listings } = useApp();
   const router = useRouter();
   const [activeGame, setActiveGame] = useState("all");
   const [sort, setSort] = useState<SortKey>("newest");
@@ -59,10 +59,10 @@ export default function Home() {
                 <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
                   + Sell
                 </button>
-                <a href={`/sellers/${encodeURIComponent(user.name)}`} style={{ fontSize: 14, color: "#94a3b8", textDecoration: "none" }}>
-                  {user.name}
-                </a>
-                <button onClick={logout} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
+                <span style={{ fontSize: 14, color: "#94a3b8" }}>
+                  {displayName(user)}
+                </span>
+                <button onClick={signOut} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
                   Log out
                 </button>
               </>
