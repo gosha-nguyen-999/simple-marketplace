@@ -85,9 +85,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (data) setListings(data.map(mapRow));
   }
 
-  async function fetchProfile(uid: string) {
+  async function fetchProfile(uid: string, email: string | undefined, name: string | undefined) {
     // ensure_profile() is SECURITY DEFINER — runs as postgres, bypasses RLS
-    await supabase.rpc("ensure_profile");
+    await supabase.rpc("ensure_profile", { p_email: email ?? null, p_full_name: name ?? null });
     const { data } = await supabase.from("profiles").select("*").eq("id", uid).single();
     if (data) setProfile(data as Profile);
     return data as Profile | null;
@@ -137,7 +137,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        const p = await fetchProfile(u.id);
+        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
         await fetchSellerRequestStatus(u.id);
         if (p?.is_admin) await fetchPendingRequests();
       }
@@ -148,7 +148,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        const p = await fetchProfile(u.id);
+        const p = await fetchProfile(u.id, u.email, u.user_metadata?.full_name ?? u.user_metadata?.name);
         await fetchSellerRequestStatus(u.id);
         if (p?.is_admin) await fetchPendingRequests();
       } else {
