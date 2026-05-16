@@ -133,3 +133,28 @@ test("admin page back button navigates to homepage", async ({ page }) => {
   await backBtn.click();
   await expect(page).toHaveURL("/");
 });
+
+// ─── Listing detail page ──────────────────────────────────────────────────────
+
+test("listing page shows not-found for non-existent numeric id", async ({ page }) => {
+  await page.goto("/listings/999999999");
+  await expect(page.getByText(/listing not found/i)).toBeVisible({ timeout: 15000 });
+});
+
+test("listing page shows not-found for a UUID (non-numeric) id", async ({ page }) => {
+  await page.goto("/listings/1101cc98-f5a2-4547-94d6-b6a6e3475a74");
+  await expect(page.getByText(/listing not found/i)).toBeVisible({ timeout: 15000 });
+});
+
+test("listing not-found page has back to marketplace button", async ({ page }) => {
+  await page.goto("/listings/999999999");
+  await expect(page.getByRole("button", { name: /back to marketplace/i })).toBeVisible({ timeout: 15000 });
+});
+
+test("listing not-found back button navigates to homepage", async ({ page }) => {
+  await page.goto("/listings/999999999");
+  const btn = page.getByRole("button", { name: /back to marketplace/i });
+  await btn.waitFor({ timeout: 15000 });
+  await btn.click();
+  await expect(page).toHaveURL("/");
+});

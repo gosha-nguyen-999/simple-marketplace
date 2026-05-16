@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApp } from "../../context/AppContext";
+import { supabase } from "../../../lib/supabase";
+import type { Listing } from "../../context/AppContext";
 
 const RARITY_ACCENT: Record<string, string> = {
   Common: "#94a3b8", Uncommon: "#22c55e", Rare: "#3b82f6",
@@ -10,12 +12,49 @@ const RARITY_ACCENT: Record<string, string> = {
 };
 
 export default function ListingPage() {
-  const { listings, user, profile } = useApp();
+  const { user, profile } = useApp();
   const router = useRouter();
   const params = useParams();
   const [showEmail, setShowEmail] = useState(false);
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [fetching, setFetching] = useState(true);
 
-  const listing = listings.find((l) => l.id === Number(params.id));
+  useEffect(() => {
+    async function load() {
+      const id = Number(params.id);
+      if (!id || isNaN(id)) { setFetching(false); return; }
+      const { data } = await supabase
+        .from("listings")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (data) {
+        setListing({
+          id: data.id,
+          game: data.game,
+          category: data.category,
+          name: data.name,
+          price: Number(data.price),
+          rarity: data.rarity,
+          condition: data.condition,
+          description: data.description ?? undefined,
+          emoji: data.emoji,
+          seller: data.seller,
+          sellerEmail: data.seller_email,
+        });
+      }
+      setFetching(false);
+    }
+    load();
+  }, [params.id]);
+
+  if (fetching) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#0d0d14", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
+        Loading…
+      </div>
+    );
+  }
 
   if (!listing) {
     return (
