@@ -183,8 +183,14 @@ export default function ListingPage() {
               ${listing.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </div>
 
-            <button style={{ width: "100%", background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 12, padding: "16px", fontWeight: 700, fontSize: 16, cursor: "pointer", marginBottom: 12 }}>
-              Buy Now
+            <button
+              onClick={() => {
+                if (!user) { router.push("/login"); return; }
+                setShowEmail(true);
+              }}
+              style={{ width: "100%", background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 12, padding: "16px", fontWeight: 700, fontSize: 16, cursor: "pointer", marginBottom: 12 }}
+            >
+              Contact Seller
             </button>
 
             {/* Contact seller */}
