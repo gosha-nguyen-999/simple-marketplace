@@ -30,12 +30,13 @@ export default function ListingPage() {
 
     // Direct URL access: fetch from Supabase.
     let cancelled = false;
-    supabase
-      .from("listings")
-      .select("*")
-      .eq("id", id)
-      .single()
-      .then(({ data }) => {
+    async function load() {
+      try {
+        const { data } = await supabase
+          .from("listings")
+          .select("*")
+          .eq("id", id)
+          .single();
         if (cancelled) return;
         if (data) {
           setListing({
@@ -52,9 +53,13 @@ export default function ListingPage() {
             sellerEmail: data.seller_email,
           });
         }
-        setFetching(false);
-      })
-      .catch(() => { if (!cancelled) setFetching(false); });
+      } catch {
+        // network error — fall through to finally
+      } finally {
+        if (!cancelled) setFetching(false);
+      }
+    }
+    load();
 
     return () => { cancelled = true; };
   }, [params.id, listings]);
