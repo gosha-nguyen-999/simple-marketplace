@@ -139,11 +139,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setUser(u);
 
       // Kick off listings fetch concurrently with profile fetch.
-      // SIGNED_IN re-added now that authenticated role has SELECT grant.
-      // We await the promise below so setLoading(false) never fires before
-      // listings data is ready, eliminating the 0-listings flash.
-      const needsListings = event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "SIGNED_OUT";
-      const listingsPromise = needsListings ? fetchListings() : null;
+      // Only INITIAL_SESSION and SIGNED_OUT need a fresh fetch.
+      // SIGNED_IN is intentionally skipped — Google OAuth causes a new page
+      // load which fires INITIAL_SESSION first; if SIGNED_IN also fetched
+      // it could overwrite with stale/empty data before the JWT is applied.
+      const listingsPromise = (event === "INITIAL_SESSION" || event === "SIGNED_OUT")
+        ? fetchListings()
+        : null;
 
       if (u) {
         try {
@@ -159,8 +161,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPendingRequests([]);
       }
 
-      if (listingsPromise) await listingsPromise;
-      if (event === "INITIAL_SESSION") setLoading(false);
+      // Wait for listings before unblocking the loading screen so the page
+      // never renders with 0 listings when data is actually available.
+      if (event === "INITIAL_SESSION") {
+        if (listingsPromise) await listingsPromise;
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -175,15 +181,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
-    try {
-      await supabase.auth.signOut({ scope: "local" });
-    } catch {
-      // ignore server errors — local session is cleared below regardless
-    }
+    // Clear local state immediately so the UI responds instantly.
+    // Fire the server revocation in the background — if it fails or hangs,
+    // the user is still logged out locally.
     setUser(null);
     setProfile(null);
     setSellerRequestStatus("none");
     setPendingRequests([]);
+    supabase.auth.signOut({ scope: "local" }).catch(() => {});
   }
 
   async function addListing(data: Omit<Listing, "id">) {
