@@ -138,14 +138,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
 
-      // INITIAL_SESSION: page load (anon or authed, JWT already applied)
-      // SIGNED_OUT: role switches back to anon, need fresh fetch
-      // SIGNED_IN skipped — Google OAuth redirects to a new page load,
-      // which fires INITIAL_SESSION; a second fetch with the JWT active
-      // was overwriting the listings with 0 due to a Supabase RLS issue
-      if (event === "INITIAL_SESSION" || event === "SIGNED_OUT") {
-        fetchListings();
-      }
+      // Kick off listings fetch concurrently with profile fetch.
+      // SIGNED_IN re-added now that authenticated role has SELECT grant.
+      // We await the promise below so setLoading(false) never fires before
+      // listings data is ready, eliminating the 0-listings flash.
+      const needsListings = event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "SIGNED_OUT";
+      const listingsPromise = needsListings ? fetchListings() : null;
 
       if (u) {
         try {
@@ -161,6 +159,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPendingRequests([]);
       }
 
+      if (listingsPromise) await listingsPromise;
       if (event === "INITIAL_SESSION") setLoading(false);
     });
 
