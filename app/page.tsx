@@ -56,18 +56,20 @@ export default function Home() {
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {user ? (
               <>
-                {profile?.is_seller ? (
-                  <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
-                    + Sell
-                  </button>
-                ) : sellerRequestStatus === "pending" ? (
-                  <span style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, fontSize: 14, fontWeight: 500 }}>
-                    ⏳ Approval pending
-                  </span>
-                ) : (
-                  <button onClick={() => router.push("/sell")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.4)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
-                    Become a seller
-                  </button>
+                {profile !== null && (
+                  profile.is_seller ? (
+                    <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
+                      + Sell
+                    </button>
+                  ) : sellerRequestStatus === "pending" ? (
+                    <span style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, fontSize: 14, fontWeight: 500 }}>
+                      ⏳ Approval pending
+                    </span>
+                  ) : (
+                    <button onClick={() => router.push("/sell")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.4)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
+                      Become a seller
+                    </button>
+                  )
                 )}
                 {profile?.is_admin && (
                   <button onClick={() => router.push("/admin")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.3)", color: "#a855f7", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>

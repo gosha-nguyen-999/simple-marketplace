@@ -20,6 +20,8 @@ export default function ListingPage() {
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function load() {
       const id = params.id as string;
       if (!id) { setFetching(false); return; }
@@ -28,6 +30,7 @@ export default function ListingPage() {
           .from("listings")
           .select("*")
           .eq("id", id)
+          .abortSignal(controller.signal)
           .single();
         if (data) {
           setListing({
@@ -49,6 +52,8 @@ export default function ListingPage() {
       }
     }
     load();
+
+    return () => controller.abort();
   }, [params.id]);
 
   if (fetching) {
