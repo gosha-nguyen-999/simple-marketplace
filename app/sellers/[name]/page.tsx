@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
-import { useApp } from "../../context/AppContext";
+import { useApp, displayName } from "../../context/AppContext";
 
 const RARITY_ACCENT: Record<string, string> = {
   Common: "#94a3b8", Uncommon: "#22c55e", Rare: "#3b82f6",
@@ -13,7 +14,7 @@ function avatarInitials(name: string) {
 }
 
 export default function SellerPage() {
-  const { listings, user, profile } = useApp();
+  const { listings, user, profile, sellerRequestStatus, signOut } = useApp();
   const router = useRouter();
   const params = useParams();
   const sellerName = decodeURIComponent(params.name as string);
@@ -39,14 +40,48 @@ export default function SellerPage() {
       {/* Nav */}
       <nav style={{ background: "rgba(13,13,20,0.95)", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</a>
-          <div style={{ display: "flex", gap: 12 }}>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+            <span style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>VaultTrade</span>
+            <span style={{ fontSize: 11, background: "#a855f7", color: "#fff", borderRadius: 4, padding: "2px 6px", fontWeight: 700, letterSpacing: "0.05em" }}>BETA</span>
+          </Link>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {user ? (
-              profile?.is_seller && <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>+ Sell</button>
+              <>
+                {profile !== null && (
+                  profile.is_seller ? (
+                    <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
+                      + Sell
+                    </button>
+                  ) : sellerRequestStatus === "pending" ? (
+                    <span style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, fontSize: 14, fontWeight: 500 }}>
+                      ⏳ Approval pending
+                    </span>
+                  ) : (
+                    <button onClick={() => router.push("/sell")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.4)", color: "#c084fc", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
+                      Become a seller
+                    </button>
+                  )
+                )}
+                {profile?.is_admin && (
+                  <button onClick={() => router.push("/admin")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.3)", color: "#a855f7", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
+                    Admin
+                  </button>
+                )}
+                <span style={{ fontSize: 14, color: "#94a3b8" }}>
+                  {displayName(user)}
+                </span>
+                <button onClick={signOut} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
+                  Log out
+                </button>
+              </>
             ) : (
               <>
-                <button onClick={() => router.push("/login")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>Log in</button>
-                <button onClick={() => router.push("/signup")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontSize: 14 }}>Sign up</button>
+                <button onClick={() => router.push("/login")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
+                  Log in
+                </button>
+                <button onClick={() => router.push("/signup")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
+                  Sign up
+                </button>
               </>
             )}
           </div>
@@ -56,7 +91,7 @@ export default function SellerPage() {
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 24px" }}>
         {/* Breadcrumb */}
         <div style={{ fontSize: 13, color: "#64748b", marginBottom: 32, display: "flex", gap: 8 }}>
-          <a href="/" style={{ color: "#64748b", textDecoration: "none" }}>Marketplace</a>
+          <Link href="/" style={{ color: "#64748b", textDecoration: "none" }}>Marketplace</Link>
           <span>›</span>
           <span style={{ color: "#94a3b8" }}>{sellerName}</span>
         </div>
