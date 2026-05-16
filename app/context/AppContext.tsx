@@ -83,8 +83,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .from("listings")
       .select("*")
       .order("created_at", { ascending: false });
-    console.log("[fetchListings] rows:", data?.length ?? 0, "error:", error?.message ?? "none", "code:", error?.code ?? "-");
-    if (error) console.error("[fetchListings] full error:", error);
     if (data) setListings(data.map(mapRow));
   }
 
