@@ -140,8 +140,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
 
-      // Fetch listings on the events that change the active role
-      if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      // INITIAL_SESSION: page load (anon or authed, JWT already applied)
+      // SIGNED_OUT: role switches back to anon, need fresh fetch
+      // SIGNED_IN skipped — Google OAuth redirects to a new page load,
+      // which fires INITIAL_SESSION; a second fetch with the JWT active
+      // was overwriting the listings with 0 due to a Supabase RLS issue
+      if (event === "INITIAL_SESSION" || event === "SIGNED_OUT") {
         fetchListings();
       }
 
