@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp, displayName } from "../context/AppContext";
 
@@ -17,7 +18,7 @@ const RARITIES = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Exotic"];
 const EMOJIS = ["🔪", "🔫", "🧤", "🎯", "⚡", "👑", "🌀", "💀", "🪖", "⛏️", "🕺", "🌌", "🪄", "🎧", "🎮", "👸", "🏆", "💎", "🎁", "🛡️"];
 
 export default function SellPage() {
-  const { user, profile, sellerRequestStatus, addListing, requestSellerAccess } = useApp();
+  const { user, profile, sellerRequestStatus, addListing, requestSellerAccess, signOut } = useApp();
   const router = useRouter();
 
   const [game, setGame] = useState("CS2");
@@ -108,8 +109,24 @@ export default function SellPage() {
     <div style={{ minHeight: "100vh", background: "#0d0d14", color: "#f0f0f0" }}>
       <nav style={{ background: "rgba(13,13,20,0.95)", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</a>
-          <span style={{ fontSize: 14, color: "#64748b" }}>Logged in as <span style={{ color: "#a855f7" }}>{displayName(user)}</span></span>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+            <span style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>VaultTrade</span>
+            <span style={{ fontSize: 11, background: "#a855f7", color: "#fff", borderRadius: 4, padding: "2px 6px", fontWeight: 700, letterSpacing: "0.05em" }}>BETA</span>
+          </Link>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 700, border: "none" }}>
+              + Sell
+            </button>
+            {profile?.is_admin && (
+              <button onClick={() => router.push("/admin")} style={{ background: "transparent", border: "1px solid rgba(168,85,247,0.3)", color: "#a855f7", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
+                Admin
+              </button>
+            )}
+            <span style={{ fontSize: 14, color: "#94a3b8" }}>{displayName(user)}</span>
+            <button onClick={signOut} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#f0f0f0", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
+              Log out
+            </button>
+          </div>
         </div>
       </nav>
 

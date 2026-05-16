@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useApp } from "../context/AppContext";
 
 export default function SignupPage() {
@@ -7,9 +8,9 @@ export default function SignupPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#0d0d14", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <a href="/" style={{ fontSize: 24, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none", marginBottom: 40 }}>
+      <Link href="/" style={{ fontSize: 24, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none", marginBottom: 40 }}>
         VaultTrade
-      </a>
+      </Link>
       <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "40px 36px", width: "100%", maxWidth: 400, textAlign: "center" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#f0f0f0" }}>Create your account</h1>
         <p style={{ fontSize: 14, color: "#64748b", marginBottom: 36 }}>Start buying and selling game assets today</p>
@@ -29,7 +30,7 @@ export default function SignupPage() {
 
         <p style={{ fontSize: 13, color: "#64748b", marginTop: 24 }}>
           Already have an account?{" "}
-          <a href="/login" style={{ color: "#a855f7", fontWeight: 600, textDecoration: "none" }}>Log in</a>
+          <Link href="/login" style={{ color: "#a855f7", fontWeight: 600, textDecoration: "none" }}>Log in</Link>
         </p>
       </div>
     </div>
