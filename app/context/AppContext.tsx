@@ -151,7 +151,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         try {
           const p = await fetchProfile(u.id);
           await fetchSellerRequestStatus(u.id);
-          if (p?.is_admin) await fetchPendingRequests();
+          // Fire-and-forget: pending requests are only needed on the admin
+          // panel page, not for the home page to render. Awaiting it would
+          // block setLoading(false) if the query is slow or hangs.
+          if (p?.is_admin) fetchPendingRequests();
         } catch (e) {
           console.error("[AppContext] profile fetch failed", e);
         }
@@ -164,7 +167,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Wait for listings before unblocking the loading screen so the page
       // never renders with 0 listings when data is actually available.
       if (event === "INITIAL_SESSION") {
-        if (listingsPromise) await listingsPromise;
+        try {
+          if (listingsPromise) await listingsPromise;
+        } catch (e) {
+          console.error("[AppContext] listings fetch failed", e);
+        }
         setLoading(false);
       }
     });
