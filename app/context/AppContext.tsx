@@ -5,7 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
 
 export type Listing = {
-  id: number;
+  id: string;
   game: string;
   category: string;
   name: string;
@@ -56,7 +56,7 @@ const AppContext = createContext<AppContextType | null>(null);
 
 function mapRow(row: Record<string, unknown>): Listing {
   return {
-    id: row.id as number,
+    id: String(row.id),
     game: row.game as string,
     category: row.category as string,
     name: row.name as string,

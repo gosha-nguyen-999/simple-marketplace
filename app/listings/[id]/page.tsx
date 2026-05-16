@@ -21,8 +21,8 @@ export default function ListingPage() {
 
   useEffect(() => {
     async function load() {
-      const id = Number(params.id);
-      if (!id || isNaN(id)) { setFetching(false); return; }
+      const id = params.id as string;
+      if (!id) { setFetching(false); return; }
       const { data } = await supabase
         .from("listings")
         .select("*")
@@ -30,7 +30,7 @@ export default function ListingPage() {
         .single();
       if (data) {
         setListing({
-          id: data.id,
+          id: String(data.id),
           game: data.game,
           category: data.category,
           name: data.name,

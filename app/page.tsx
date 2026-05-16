@@ -41,7 +41,7 @@ export default function Home() {
     .sort((a, b) => {
       if (sort === "price-asc") return a.price - b.price;
       if (sort === "price-desc") return b.price - a.price;
-      return b.id - a.id;
+      return 0;
     });
 
   return (
