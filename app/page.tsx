@@ -25,7 +25,7 @@ const GAME_FILTERS = [
 type SortKey = "newest" | "price-asc" | "price-desc";
 
 export default function Home() {
-  const { user, profile, sellerRequestStatus, signOut, listings } = useApp();
+  const { user, profile, sellerRequestStatus, signOut, listings, loading } = useApp();
   const router = useRouter();
   const [activeGame, setActiveGame] = useState("all");
   const [sort, setSort] = useState<SortKey>("newest");
@@ -175,6 +175,12 @@ export default function Home() {
 
       {/* Listings Grid */}
       <main style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 24px 64px" }}>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "80px 0", color: "#64748b" }}>
+            <p style={{ fontSize: 16 }}>Loading listings…</p>
+          </div>
+        ) : (
+        <>
         <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
           {filtered.length} listing{filtered.length !== 1 ? "s" : ""} found
         </p>
@@ -240,6 +246,8 @@ export default function Home() {
               );
             })}
           </div>
+        )}
+        </>
         )}
       </main>
 
