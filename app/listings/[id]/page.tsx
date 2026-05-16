@@ -193,25 +193,11 @@ export default function ListingPage() {
               Contact Seller
             </button>
 
-            {/* Contact seller */}
             <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: showEmail ? 12 : 0 }}>
-                <div>
-                  <p style={{ fontSize: 13, color: "#64748b", marginBottom: 2 }}>Sold by</p>
-                  <Link href={`/sellers/${encodeURIComponent(listing.seller)}`} style={{ fontSize: 15, fontWeight: 700, color: "#a855f7", textDecoration: "none" }}>{listing.seller}</Link>
-                </div>
-                <button
-                  onClick={() => {
-                    if (!user) { router.push("/login"); return; }
-                    setShowEmail(true);
-                  }}
-                  style={{ background: showEmail ? "rgba(255,255,255,0.06)" : "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: showEmail ? "#64748b" : "#c084fc", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600 }}
-                >
-                  {showEmail ? "Email revealed" : "Contact seller"}
-                </button>
-              </div>
+              <p style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>Sold by</p>
+              <Link href={`/sellers/${encodeURIComponent(listing.seller)}`} style={{ fontSize: 15, fontWeight: 700, color: "#a855f7", textDecoration: "none" }}>{listing.seller}</Link>
               {showEmail && (
-                <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 8, padding: "10px 14px", marginTop: 12 }}>
                   <span style={{ fontSize: 16 }}>✉️</span>
                   <a href={`mailto:${listing.sellerEmail}`} style={{ fontSize: 14, color: "#c084fc", textDecoration: "none", fontWeight: 600 }}>{listing.sellerEmail}</a>
                 </div>
