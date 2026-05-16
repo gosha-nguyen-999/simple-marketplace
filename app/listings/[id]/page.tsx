@@ -23,27 +23,30 @@ export default function ListingPage() {
     async function load() {
       const id = params.id as string;
       if (!id) { setFetching(false); return; }
-      const { data } = await supabase
-        .from("listings")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (data) {
-        setListing({
-          id: String(data.id),
-          game: data.game,
-          category: data.category,
-          name: data.name,
-          price: Number(data.price),
-          rarity: data.rarity,
-          condition: data.condition,
-          description: data.description ?? undefined,
-          emoji: data.emoji,
-          seller: data.seller,
-          sellerEmail: data.seller_email,
-        });
+      try {
+        const { data } = await supabase
+          .from("listings")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (data) {
+          setListing({
+            id: String(data.id),
+            game: data.game,
+            category: data.category,
+            name: data.name,
+            price: Number(data.price),
+            rarity: data.rarity,
+            condition: data.condition,
+            description: data.description ?? undefined,
+            emoji: data.emoji,
+            seller: data.seller,
+            sellerEmail: data.seller_email,
+          });
+        }
+      } finally {
+        setFetching(false);
       }
-      setFetching(false);
     }
     load();
   }, [params.id]);

@@ -9,12 +9,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // HTML pages — never serve stale; browser always revalidates
+        // HTML pages — no-store prevents both browser and CDN from caching
         source: "/((?!_next/static|_next/image|favicon.ico).*)",
         headers: [
           {
             key: "Cache-Control",
-            value: "no-cache, must-revalidate",
+            value: "no-store",
           },
         ],
       },
