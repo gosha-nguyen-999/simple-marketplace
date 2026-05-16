@@ -13,7 +13,7 @@ const RARITY_ACCENT: Record<string, string> = {
 };
 
 export default function ListingPage() {
-  const { user, profile, sellerRequestStatus, signOut, listings } = useApp();
+  const { user, profile, sellerRequestStatus, signOut, listings, loading } = useApp();
   const router = useRouter();
   const params = useParams();
   const [showEmail, setShowEmail] = useState(false);
@@ -21,14 +21,17 @@ export default function ListingPage() {
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
+    if (loading) return; // wait for AppContext to finish loading listings
+
     const id = params.id as string;
     if (!id) { setFetching(false); return; }
 
-    // If the listing is already in context (navigated from home), use it immediately.
+    // By the time loading=false, AppContext has fetched all listings.
+    // Look up from context first — works for client navigation and Ctrl+R.
     const cached = listings.find((l) => l.id === id);
     if (cached) { setListing(cached); setFetching(false); return; }
 
-    // Direct URL access: fetch from Supabase.
+    // Listing not in context (e.g. deleted or context fetch failed) — fetch directly.
     let cancelled = false;
     async function load() {
       try {
@@ -62,7 +65,8 @@ export default function ListingPage() {
     load();
 
     return () => { cancelled = true; };
-  }, [params.id, listings]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id, loading]);
 
   if (fetching) {
     return (
