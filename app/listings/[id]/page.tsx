@@ -13,7 +13,7 @@ const RARITY_ACCENT: Record<string, string> = {
 };
 
 export default function ListingPage() {
-  const { user, profile, sellerRequestStatus, signOut } = useApp();
+  const { user, profile, sellerRequestStatus, signOut, listings } = useApp();
   const router = useRouter();
   const params = useParams();
   const [showEmail, setShowEmail] = useState(false);
@@ -21,18 +21,22 @@ export default function ListingPage() {
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
-    const controller = new AbortController();
+    const id = params.id as string;
+    if (!id) { setFetching(false); return; }
 
-    async function load() {
-      const id = params.id as string;
-      if (!id) { setFetching(false); return; }
-      try {
-        const { data } = await supabase
-          .from("listings")
-          .select("*")
-          .eq("id", id)
-          .abortSignal(controller.signal)
-          .single();
+    // If the listing is already in context (navigated from home), use it immediately.
+    const cached = listings.find((l) => l.id === id);
+    if (cached) { setListing(cached); setFetching(false); return; }
+
+    // Direct URL access: fetch from Supabase.
+    let cancelled = false;
+    supabase
+      .from("listings")
+      .select("*")
+      .eq("id", id)
+      .single()
+      .then(({ data }) => {
+        if (cancelled) return;
         if (data) {
           setListing({
             id: String(data.id),
@@ -48,14 +52,12 @@ export default function ListingPage() {
             sellerEmail: data.seller_email,
           });
         }
-      } finally {
         setFetching(false);
-      }
-    }
-    load();
+      })
+      .catch(() => { if (!cancelled) setFetching(false); });
 
-    return () => controller.abort();
-  }, [params.id]);
+    return () => { cancelled = true; };
+  }, [params.id, listings]);
 
   if (fetching) {
     return (
