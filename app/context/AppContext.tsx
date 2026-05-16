@@ -156,6 +156,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const p = await fetchProfile(u.id);
         await fetchSellerRequestStatus(u.id);
         if (p?.is_admin) await fetchPendingRequests();
+        await fetchListings();
       } else {
         setProfile(null);
         setSellerRequestStatus("none");
@@ -177,7 +178,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch {
+      // ignore server errors — local session is cleared below regardless
+    }
     setUser(null);
     setProfile(null);
     setSellerRequestStatus("none");
