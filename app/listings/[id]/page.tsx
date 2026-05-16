@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { useApp } from "../../context/AppContext";
 import { supabase } from "../../../lib/supabase";
 import type { Listing } from "../../context/AppContext";
@@ -81,7 +82,7 @@ export default function ListingPage() {
       {/* Nav */}
       <nav style={{ background: "rgba(13,13,20,0.95)", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</a>
+          <Link href="/" style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #a855f7, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textDecoration: "none" }}>VaultTrade</Link>
           <div style={{ display: "flex", gap: 12 }}>
             {user ? (
               profile?.is_seller && <button onClick={() => router.push("/sell")} style={{ background: "linear-gradient(135deg, #a855f7, #3b82f6)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>+ Sell</button>
@@ -98,7 +99,7 @@ export default function ListingPage() {
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "48px 24px" }}>
         {/* Breadcrumb */}
         <div style={{ fontSize: 13, color: "#64748b", marginBottom: 32, display: "flex", gap: 8, alignItems: "center" }}>
-          <a href="/" style={{ color: "#64748b", textDecoration: "none" }}>Marketplace</a>
+          <Link href="/" style={{ color: "#64748b", textDecoration: "none" }}>Marketplace</Link>
           <span>›</span>
           <span style={{ color: "#94a3b8" }}>{listing.name}</span>
         </div>
@@ -150,7 +151,7 @@ export default function ListingPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: showEmail ? 12 : 0 }}>
                 <div>
                   <p style={{ fontSize: 13, color: "#64748b", marginBottom: 2 }}>Sold by</p>
-                  <a href={`/sellers/${encodeURIComponent(listing.seller)}`} style={{ fontSize: 15, fontWeight: 700, color: "#a855f7", textDecoration: "none" }}>{listing.seller}</a>
+                  <Link href={`/sellers/${encodeURIComponent(listing.seller)}`} style={{ fontSize: 15, fontWeight: 700, color: "#a855f7", textDecoration: "none" }}>{listing.seller}</Link>
                 </div>
                 <button
                   onClick={() => {

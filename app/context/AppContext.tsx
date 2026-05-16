@@ -135,36 +135,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       const u = session?.user ?? null;
       setUser(u);
-      try {
-        if (u) {
+
+      // Fetch listings on the events that change the active role
+      if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        fetchListings();
+      }
+
+      if (u) {
+        try {
           const p = await fetchProfile(u.id);
           await fetchSellerRequestStatus(u.id);
           if (p?.is_admin) await fetchPendingRequests();
+        } catch (e) {
+          console.error("[AppContext] profile fetch failed", e);
         }
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) {
-        const p = await fetchProfile(u.id);
-        await fetchSellerRequestStatus(u.id);
-        if (p?.is_admin) await fetchPendingRequests();
-        await fetchListings();
       } else {
         setProfile(null);
         setSellerRequestStatus("none");
         setPendingRequests([]);
       }
-    });
 
-    fetchListings();
+      if (event === "INITIAL_SESSION") setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
