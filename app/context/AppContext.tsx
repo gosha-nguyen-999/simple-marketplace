@@ -79,10 +79,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
 
   async function fetchListings() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("listings")
       .select("*")
       .order("created_at", { ascending: false });
+    if (error) console.error("[fetchListings]", error);
     if (data) setListings(data.map(mapRow));
   }
 

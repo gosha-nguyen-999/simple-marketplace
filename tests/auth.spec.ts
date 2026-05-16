@@ -134,6 +134,27 @@ test("admin page back button navigates to homepage", async ({ page }) => {
   await expect(page).toHaveURL("/");
 });
 
+// ─── Homepage listings ────────────────────────────────────────────────────────
+
+test("homepage shows listing cards when data exists", async ({ page }) => {
+  await page.goto("/");
+  // Wait for data to load — count text always renders
+  await expect(page.getByText(/\d+ listings? found/i)).toBeVisible({ timeout: 15000 });
+  // Verify at least one listing card is present
+  const cards = page.locator("main [style*='cursor: pointer']");
+  await expect(cards.first()).toBeVisible({ timeout: 15000 });
+});
+
+test("homepage shows no-listings state when search matches nothing", async ({ page }) => {
+  await page.goto("/");
+  // Wait for initial load
+  await expect(page.getByText(/\d+ listings? found/i)).toBeVisible({ timeout: 15000 });
+  // Search for something guaranteed not to exist
+  await page.locator("input[placeholder*='Search']").fill("ZZZNOMATCHZZZ");
+  await expect(page.getByText(/no listings found/i)).toBeVisible();
+  await expect(page.getByText(/0 listings found/i)).toBeVisible();
+});
+
 // ─── Listing detail page ──────────────────────────────────────────────────────
 
 test("listing page shows not-found for non-existent numeric id", async ({ page }) => {
